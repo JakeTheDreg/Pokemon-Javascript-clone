@@ -8,14 +8,14 @@ class Boundary {
         this.height = 48;
     }
     draw() {
-        context.fillStyle = 'rgba(255, 0, 0, 0.0)';
+        context.fillStyle = 'rgba(255, 0, 0, 0.5)';
         context.fillRect(this.position.x, this.position.y, this.width, this.height);
     }
 }
 
 //sprite class
 class Sprite {
-    constructor({position, velocity, image, frames = {max:1}}, sprites = []) {
+    constructor({position, image, frames = {max:1}}, sprites = []) {
         this.position = position;
         this.image = image;
         this.frames = {...frames, val: 0, elapsed: 0, max: frames.max};
