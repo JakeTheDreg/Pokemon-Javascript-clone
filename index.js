@@ -16,8 +16,8 @@ const playerImageRight = new Image(); playerImageRight.src = './Assets/Images/pl
 const playerImageLeft = new Image(); playerImageLeft.src = './Assets/Images/playerLeft.png';
 const foregroundImage = new Image(); foregroundImage.src = './Assets/Images/foregroundObjects.png';
 const battleBackgroundImage = new Image(); battleBackgroundImage.src = './Assets/Images/battleBackground.png';
-const draggleImage = new Image(); draggleImage.src = './Assets/Images/draggle.png';
-const embyImage = new Image(); embyImage.src = './Assets/Images/emby.png';
+const draggleImage = new Image(); draggleImage.src = './Assets/Images/draggleSprite.png';
+const embyImage = new Image(); embyImage.src = './Assets/Images/embySprite.png';
 
 //player sprite
 const player = new Sprite({
@@ -27,7 +27,8 @@ const player = new Sprite({
     },
     image: playerImageDown,
     frames: {
-        max: 4
+        max: 4,
+        hold: 30
     },
     sprites: {
         up: playerImageUp,
@@ -120,7 +121,7 @@ function rectangularCollision(rect1, rect2) {
 }
 function battleZoneCollision(animationId) {//looks for engagement with battleZones
     // let moving = true;
-    // player.moving = false;
+    // player.animate = false;
     
     //if(battle.initiated) return;
     for (let i = 0; i < battleZones.length; i++) {
@@ -163,9 +164,9 @@ function animate() {
     foreground.draw();
 
     let moving = true;
-    player.moving = false;
+    player.animate = false;
     if (keys.w.pressed && lastKey === 'w') {
-        player.moving = true;
+        player.animate = true;
         player.image = player.sprites.up;
         //prevents collision with boundaries
         for (let i = 0; i < boundaries.length; i++) {
@@ -180,7 +181,7 @@ function animate() {
         if(moving) moveables.forEach(moveable => moveable.position.y += 2);
     }
     else if (keys.a.pressed && lastKey === 'a') {
-        player.moving = true;
+        player.animate = true;
         player.image = player.sprites.left;
         for (let i = 0; i < boundaries.length; i++) {
             const boundary = boundaries[i];
@@ -194,7 +195,7 @@ function animate() {
         if(moving) moveables.forEach(moveable => moveable.position.x += 2);
     }
     else if (keys.s.pressed && lastKey === 's') {
-        player.moving = true;
+        player.animate = true;
         player.image = player.sprites.down;
         for (let i = 0; i < boundaries.length; i++) {
             const boundary = boundaries[i];
@@ -208,7 +209,7 @@ function animate() {
         if(moving) moveables.forEach(moveable => moveable.position.y -= 2);
     }
     else if (keys.d.pressed && lastKey === 'd') {
-        player.moving = true;
+        player.animate = true;
         player.image = player.sprites.right;
         for (let i = 0; i < boundaries.length; i++) {
             const boundary = boundaries[i];
@@ -226,14 +227,32 @@ function animate() {
 
 const battleBackground = new Sprite({position:{x: 0, y: 0},  image: battleBackgroundImage});
 
+const draggle = new Sprite({position:{x: 800, y: 100}, image: draggleImage, frames: {max: 4, hold: 60}, animate: true, isEnemy: true});
+const emby = new Sprite({position:{x:  280,y: 325}, image: embyImage , frames: {max: 4, hold: 60}, animate: true});
+
 //battle animation function
+const renderedSprites = [draggle, emby];
 function animateBattle(){
     window.requestAnimationFrame(animateBattle);
     battleBackground.draw();
+
+    renderedSprites.forEach((sprite) => {
+        sprite.draw();
+    });
 }
 
+//battle button event listeners
+document.querySelectorAll('button').forEach((button) => {
+    button.addEventListener('click', (event) => {
+        const selectedAttack = attacks[event.currentTarget.innerHTML];
+        emby.attack({attack: selectedAttack, recipient: draggle, renderedSprites: renderedSprites});
+    });
+});
+
+
 //begin main animation
-animate();
+animateBattle();
+//animate();
 
 //keyboard event listeners
 let lastKey = '';
